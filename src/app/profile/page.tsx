@@ -9,13 +9,10 @@ import imageCompression from "browser-image-compression"
 export default function Home(){
     const { profile, updateProfile } = useProfile()
 
-    if(!profile) return <></>
-
-
-    const [ fullName, setFullName ] = useState<string>(profile.full_name ?? "")
-    const [ website, setWebsite ] = useState<string>(profile.website ?? "")
+    const [ fullName, setFullName ] = useState<string>(profile ? profile.full_name ?? "" : "")
+    const [ website, setWebsite ] = useState<string>(profile ? profile.website ?? "" : "")
     const [avatar, setAvatar] = useState<File | undefined>(undefined);
-    const [avatarUrl, setAvatarUrl] = useState<string>(profile.avatar_url ?? "")
+    const [avatarUrl, setAvatarUrl] = useState<string>(profile ? profile.avatar_url ?? "" : "")
 
     function handleAvatar(e: React.ChangeEvent<HTMLInputElement>){
         const file = e.target.files?.[0]
@@ -26,7 +23,7 @@ export default function Home(){
             fileType: 'image/webp'
         }
 
-        var controller = new AbortController();
+        const controller = new AbortController();
 
         imageCompression(file, options)
             .then((compressedFile)=>setAvatar(compressedFile))
@@ -58,6 +55,8 @@ export default function Home(){
 
     },[avatar])
 
+    if(!profile) return <></>
+
     return(
         <Box sx={{display: "grid", gap: 2, maxWitdh: 300}}>
             <Avatar src={avatarUrl} sx={{width:100, height: 100}}/>
@@ -66,7 +65,7 @@ export default function Home(){
                 <input type="file" hidden accept="image/*" onChange={handleAvatar} />
             </Button>
             <TextField
-            id="email"
+                id="email"
                 defaultValue={profile.username ?? ""}
                 label={"Email"}
                 slotProps={{
